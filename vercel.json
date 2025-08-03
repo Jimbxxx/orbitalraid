@@ -2,22 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/*.js",
+      "src": "orbitalraid/api/*.js",
       "use": "@vercel/node"
     },
     {
-      "src": "public/**/*",
+      "src": "orbitalraid/public/**/*",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "orbitalraid/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/public/$1"
+      "dest": "orbitalraid/public/$1"
     }
   ]
 }
