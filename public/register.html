@@ -32,7 +32,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: calc(100vh - 120px); /* Adjust based on header height */
+            min-height: calc(100vh - 120px);
             padding: 20px;
         }
         .ripple {
@@ -73,7 +73,7 @@
         <div class="text-center">
             <div class="card bg-gray-800/80 p-8 rounded-xl">
                 <h2 class="text-3xl font-bold neon-text mb-6">JOIN THE RAID ARMY</h2>
-                <form>
+                <form id="registerForm">
                     <div class="mb-6">
                         <label for="email" class="block text-gray-300 mb-2">EMAIL</label>
                         <input type="email" id="email" name="email" required class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 input-field focus:outline-none">
@@ -91,4 +91,19 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.message === 'Registration successful') window.location.href = '/signin.html';
+        });
+    </script>
 </body>
+</html>
