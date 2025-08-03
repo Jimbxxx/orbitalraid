@@ -1,4 +1,3 @@
-// api/signin.js
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
