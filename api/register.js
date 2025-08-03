@@ -1,18 +1,17 @@
-const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { username, email, password } = req.body;
-
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
   try {
+    // Manually parse body if needed
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { username, email, password } = body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
     });
