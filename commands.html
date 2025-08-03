@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Commands - Orbital Raid</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Your existing styles */
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      color: #00ffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+    main::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,255,204,0.15) 0%, transparent 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    header {
+      display: none;
+    }
+    .neon-text {
+      text-shadow: 
+        0 0 8px #00ffcc,
+        0 0 15px #00ffcc,
+        0 0 20px #00ffe5,
+        0 0 30px #00ffcc;
+      animation: pulseNeon 3s ease-in-out infinite alternate;
+    }
+    @keyframes pulseNeon {
+      0% {
+        text-shadow: 
+          0 0 8px #00ffcc,
+          0 0 15px #00ffcc,
+          0 0 20px #00ffe5,
+          0 0 30px #00ffcc;
+      }
+      100% {
+        text-shadow: 
+          0 0 12px #00ffcc,
+          0 0 25px #00ffcc,
+          0 0 30px #00ffe5,
+          0 0 40px #00ffcc;
+      }
+    }
+    .card {
+      position: relative;
+      background: rgba(0, 255, 204, 0.12);
+      border: 1px solid #00ffcc55;
+      border-radius: 1.25rem;
+      box-shadow: 
+        0 0 20px #00ffcc60,
+        inset 0 0 60px #00ffcc40;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      max-width: 700px;
+      width: 100%;
+      padding: 2.5rem 3rem 3rem 3rem;
+      z-index: 1;
+      color: #00ffcc;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+    .card:hover {
+      box-shadow: 
+        0 0 45px #00ffcccc,
+        inset 0 0 90px #00ffcc80;
+      transform: translateY(-7px);
+    }
+    .fade-in {
+      animation: fadeIn 1s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    ul.commands-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 0;
+      font-size: 1.25rem;
+      line-height: 1.7;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    ul.commands-list li {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      cursor: default;
+      border: 1px solid transparent;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    ul.commands-list li:hover {
+      background: rgba(0, 255, 204, 0.15);
+      box-shadow: 0 0 15px #00ffccaa;
+      border-color: #00ffccaa;
+    }
+    ul.commands-list li strong {
+      color: #00ffd0;
+      font-weight: 900;
+      font-size: 1.4rem;
+      margin-right: 1rem;
+      position: relative;
+      padding-bottom: 0.25rem;
+      cursor: pointer;
+    }
+    ul.commands-list li strong::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 60%;
+      background: #00ffcc;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    ul.commands-list li strong:hover::after {
+      width: 100%;
+    }
+    ul.commands-list li svg {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      stroke: #00ffcc;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    /* Server ID input styles */
+    .server-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    label {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #00ffd0;
+      user-select: none;
+    }
+    input[type="text"] {
+      padding: 0.6rem 1rem;
+      border-radius: 0.6rem;
+      border: 1.5px solid #00ffcc88;
+      background: rgba(0, 255, 204, 0.1);
+      color: #00ffcc;
+      font-size: 1.1rem;
+      outline-offset: 3px;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      border-color: #00ffcc;
+      box-shadow: 0 0 8px #00ffccaa;
+      background: rgba(0, 255, 204, 0.15);
+    }
+    select {
+      padding: 0.6rem 1rem;
+      border-radius: 0.6rem;
+      border: 1.5px solid #00ffcc88;
+      background: rgba(0, 255, 204, 0.1);
+      color: #00ffcc;
+      font-size: 1.1rem;
+      outline-offset: 3px;
+      transition: border-color 0.3s ease;
+      cursor: pointer;
+    }
+    select:focus {
+      border-color: #00ffcc;
+      box-shadow: 0 0 8px #00ffccaa;
+      background: rgba(0, 255, 204, 0.15);
+    }
+    /* Scanner box */
+    .scanner {
+      background: rgba(0, 255, 204, 0.15);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      box-shadow: inset 0 0 20px #00ffcc50;
+      color: #00ffe0;
+      font-size: 1.15rem;
+      min-height: 100px;
+      user-select: text;
+      white-space: pre-wrap;
+      font-family: 'Courier New', Courier, monospace;
+      line-height: 1.5;
+      border: 1.5px solid #00ffcc88;
+      transition: box-shadow 0.3s ease;
+    }
+    .scanner:empty::before {
+      content: "Enter a Server ID above and scan to see info here...";
+      color: #00887788;
+      font-style: italic;
+    }
+    button.scan-btn {
+      margin-top: 0.8rem;
+      background: #00ffcc;
+      color: #002222;
+      font-weight: 700;
+      border: none;
+      border-radius: 0.6rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background-color 0.25s ease;
+      user-select: none;
+      box-shadow: 0 0 8px #00ffccaa;
+    }
+    button.scan-btn:hover {
+      background: #00e6b8;
+      box-shadow: 0 0 15px #00ffcccc;
+    }
+  </style>
+</head>
+<body>
+  <main class="card fade-in" role="main" aria-label="Orbital Raid commands and server scanner">
+    <h1 class="text-4xl font-extrabold neon-text mb-4 text-center select-none">Available Commands</h1>
+
+    <ul class="commands-list" aria-label="List of commands">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+        <strong title="Raid">/raid</strong> Launch a raid on a specified target.
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" />
+        </svg>
+        <strong title="Force Raid">/forceraid</strong> Force a raid regardless of conditions.
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 12l6 6 12-12" />
+        </svg>
+        <strong title="Create Webhooks">/createwebhooks</strong> Set up webhooks for notifications.
+      </li>
+    </ul>
+
+    <div class="server-input-group" aria-label="Server ID Input and Scanner">
+      <label for="commandSelect">Select Command:</label>
+      <select id="commandSelect" name="commandSelect" aria-describedby="commandSelectHelp">
+        <option value="">-- Choose a command --</option>
+        <option value="/raid">/raid</option>
+        <option value="/forceraid">/forceraid</option>
+        <option value="/createwebhooks">/createwebhooks</option>
+      </select>
+
+      <label for="serverIdInput">Server ID:</label>
+      <input
+        type="text"
+        id="serverIdInput"
+        name="serverIdInput"
+        placeholder="Enter server ID"
+        autocomplete="off"
+        aria-describedby="serverIdHelp"
+      />
+      <button class="scan-btn" id="scanBtn" aria-live="polite" aria-label="Send command">Send Command</button>
+      <div class="scanner" id="scannerOutput" aria-live="polite" role="region" aria-atomic="true"></div>
+    </div>
+  </main>
+
+  <script>
+    const scanBtn = document.getElementById('scanBtn');
+    const serverInput = document.getElementById('serverIdInput');
+    const commandSelect = document.getElementById('commandSelect');
+    const output = document.getElementById('scannerOutput');
+
+    const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes cooldown
+
+    function getCooldownKey(command) {
+      return `orbitalRaidCooldown_${command}`;
+    }
+
+    function timeLeftMs(lastTimestamp) {
+      return COOLDOWN_MS - (Date.now() - lastTimestamp);
+    }
+
+    function formatTime(ms) {
+      const totalSeconds = Math.ceil(ms / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${minutes}m ${seconds}s`;
+    }
+
+    scanBtn.addEventListener('click', async () => {
+      const command = commandSelect.value;
+      const serverId = serverInput.value.trim();
+
+      if (!command) {
+        output.textContent = '⚠️ Please select a command.';
+        return;
+      }
+
+      if (!serverId) {
+        output.textContent = '⚠️ Please enter a valid Server ID.';
+        return;
+      }
+
+      const cooldownKey = getCooldownKey(command);
+      const lastTimeStr = localStorage.getItem(cooldownKey);
+      const lastTime = lastTimeStr ? parseInt(lastTimeStr, 10) : 0;
+
+      if (lastTime && (Date.now() - lastTime) < COOLDOWN_MS) {
+        const waitTime = timeLeftMs(lastTime);
+        output.textContent = `⏳ Cooldown active! Please wait ${formatTime(waitTime)} before sending this command again.`;
+        return;
+      }
+
+      output.textContent = `Sending command ${command} to server ${serverId}... 🔄`;
+
+      try {
+        // Replace with your actual webhook URL
+        const webhookUrl = 'https://discord.com/api/webhooks/1400804193757036625/eN_lDFG4eIDB5_0vT7KZp5Hrl3Wca_SHS9PLt5xtJpkxX5LMMLtUJf9oU8elf7wPH2u-';
+
+        const payload = {
+          content: `Command: ${command}\nServer ID: ${serverId}\nTimestamp: ${new Date().toISOString()}`
+        };
+
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          output.textContent = `❌ Failed to send command. Status: ${response.status}`;
+          return;
+        }
+
+        localStorage.setItem(cooldownKey, Date.now().toString());
+        output.textContent = `✅ Command "${command}" sent successfully to server "${serverId}".`;
+      } catch (error) {
+        console.error(error);
+        output.textContent = '❌ Error sending command. Check console for details.';
+      }
+    });
+
+    // Optional: trigger send on Enter key inside input
+    serverInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        scanBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>

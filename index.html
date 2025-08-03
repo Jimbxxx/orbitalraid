@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Orbital Raid</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    .neon-text {
+      text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+    }
+    .card {
+      transform: perspective(1000px) rotateX(10deg) rotateY(10deg);
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.05);
+      box-shadow: 0 0 20px #00ffcc;
+    }
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 120px);
+      padding: 20px;
+    }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0, 255, 204, 0.3);
+      transform: scale(0);
+      animation: ripple-effect 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes ripple-effect {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+  </style>
+  <script>
+    document.addEventListener("click", function (e) {
+      const ripple = document.createElement("span");
+      ripple.classList.add("ripple");
+      ripple.style.left = `${e.clientX - 10}px`;
+      ripple.style.top = `${e.clientY - 10}px`;
+      ripple.style.width = "20px";
+      ripple.style.height = "20px";
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  </script>
+</head>
+<body>
+  <header
+    class="bg-gray-900/80 p-6 text-center shadow-[0_0_15px_#00ffcc] fixed w-full top-0 z-10"
+  >
+    <h1 class="text-5xl font-extrabold neon-text">ORBITAL RAID</h1>
+    <!-- IMPORTANT: added id="navbar" -->
+    <nav id="navbar" class="mt-6">
+      <a
+        href="index.html"
+        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110"
+        >Home</a
+      >
+      <a
+        href="signin.html"
+        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110"
+        >Sign In</a
+      >
+      <a
+        href="register.html"
+        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110"
+        >Register</a
+      >
+    </nav>
+  </header>
+  <div class="main-content">
+    <div class="text-center">
+      <h2 class="text-4xl font-bold neon-text mb-8">
+        WELCOME TO THE RAID ZONE
+      </h2>
+      <p class="text-xl text-gray-300 mb-10">
+        Blast into the future with Orbital Raid! Dominate Discord servers, raid
+        like a pro, and join our epic community. Unlock insane tools and gear
+        up for the ultimate raid experience!
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <a
+          href="https://orbitals.mysellauth.com/"
+          class="card bg-gray-800/80 p-6 rounded-xl hover:bg-teal-900/50 text-center"
+        >
+          <h3 class="text-2xl text-teal-300 font-semibold">SHOP</h3>
+          <p class="text-gray-400">Get epic raid gear!</p>
+        </a>
+        <a
+          href="https://discord.gg/fGabkgYEKZ"
+          class="card bg-gray-800/80 p-6 rounded-xl hover:bg-teal-900/50 text-center"
+        >
+          <h3 class="text-2xl text-teal-300 font-semibold">DISCORD</h3>
+          <p class="text-gray-400">Join the raid squad!</p>
+        </a>
+        <a
+          href="commands.html"
+          class="card bg-gray-800/80 p-6 rounded-xl hover:bg-teal-900/50 text-center"
+        >
+          <h3 class="text-2xl text-teal-300 font-semibold">FREE TOOL</h3>
+          <p class="text-gray-400">Unlock free power!</p>
+        </a>
+        <a
+          href="signin.html"
+          class="card bg-gray-800/80 p-6 rounded-xl hover:bg-teal-900/50 text-center"
+        >
+          <h3 class="text-2xl text-teal-300 font-semibold">SIGN IN/REGISTER</h3>
+          <p class="text-gray-400">Become a raider!</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      initializeApp,
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBHSvsU8959UOsPrJKLfPLDDKzzXer-eco",
+      authDomain: "orbital-raid-data.firebaseapp.com",
+      projectId: "orbital-raid-data",
+      storageBucket: "orbital-raid-data.firebasestorage.app",
+      messagingSenderId: "1026103707268",
+      appId: "1:1026103707268:web:82aadea2cd5765599824d1",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const navbar = document.getElementById("navbar");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User signed in — add Profile link if not already there
+        if (!document.getElementById("profile-link")) {
+          const profileLink = document.createElement("a");
+          profileLink.href = "profile.html";
+          profileLink.id = "profile-link";
+          profileLink.className =
+            "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
+          profileLink.textContent = "Profile";
+
+          navbar.appendChild(profileLink);
+        }
+      } else {
+        // User signed out — remove Profile link if it exists
+        const profileLink = document.getElementById("profile-link");
+        if (profileLink) {
+          navbar.removeChild(profileLink);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
