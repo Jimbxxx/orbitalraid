@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Commands - Orbital Raid</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Your existing styles */
     body {
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       min-height: 100vh;
@@ -68,8 +67,6 @@
         0 0 20px #00ffcc60,
         inset 0 0 60px #00ffcc40;
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: box-shadow 0.3s ease, transform 0.3s ease;
       max-width: 700px;
       width: 100%;
       padding: 2.5rem 3rem 3rem 3rem;
@@ -95,7 +92,6 @@
     ul.commands-list {
       list-style: none;
       padding-left: 0;
-      margin-top: 0;
       font-size: 1.25rem;
       line-height: 1.7;
       display: flex;
@@ -107,7 +103,6 @@
       align-items: center;
       padding: 0.75rem 1rem;
       border-radius: 0.5rem;
-      cursor: default;
       border: 1px solid transparent;
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
@@ -139,17 +134,6 @@
     ul.commands-list li strong:hover::after {
       width: 100%;
     }
-    ul.commands-list li svg {
-      flex-shrink: 0;
-      width: 20px;
-      height: 20px;
-      margin-right: 12px;
-      stroke: #00ffcc;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    /* Server ID input styles */
     .server-input-group {
       display: flex;
       flex-direction: column;
@@ -159,23 +143,8 @@
       font-weight: 700;
       font-size: 1.15rem;
       color: #00ffd0;
-      user-select: none;
     }
-    input[type="text"] {
-      padding: 0.6rem 1rem;
-      border-radius: 0.6rem;
-      border: 1.5px solid #00ffcc88;
-      background: rgba(0, 255, 204, 0.1);
-      color: #00ffcc;
-      font-size: 1.1rem;
-      outline-offset: 3px;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus {
-      border-color: #00ffcc;
-      box-shadow: 0 0 8px #00ffccaa;
-      background: rgba(0, 255, 204, 0.15);
-    }
+    input[type="text"],
     select {
       padding: 0.6rem 1rem;
       border-radius: 0.6rem;
@@ -183,16 +152,13 @@
       background: rgba(0, 255, 204, 0.1);
       color: #00ffcc;
       font-size: 1.1rem;
-      outline-offset: 3px;
-      transition: border-color 0.3s ease;
-      cursor: pointer;
     }
+    input[type="text"]:focus,
     select:focus {
       border-color: #00ffcc;
       box-shadow: 0 0 8px #00ffccaa;
       background: rgba(0, 255, 204, 0.15);
     }
-    /* Scanner box */
     .scanner {
       background: rgba(0, 255, 204, 0.15);
       border-radius: 1rem;
@@ -204,9 +170,7 @@
       user-select: text;
       white-space: pre-wrap;
       font-family: 'Courier New', Courier, monospace;
-      line-height: 1.5;
       border: 1.5px solid #00ffcc88;
-      transition: box-shadow 0.3s ease;
     }
     .scanner:empty::before {
       content: "Enter a Server ID above and scan to see info here...";
@@ -223,9 +187,6 @@
       padding: 0.7rem 1.5rem;
       font-size: 1.1rem;
       cursor: pointer;
-      align-self: flex-start;
-      transition: background-color 0.25s ease;
-      user-select: none;
       box-shadow: 0 0 8px #00ffccaa;
     }
     button.scan-btn:hover {
@@ -237,49 +198,29 @@
 <body>
   <main class="card fade-in" role="main" aria-label="Orbital Raid commands and server scanner">
     <h1 class="text-4xl font-extrabold neon-text mb-4 text-center select-none">Available Commands</h1>
-
     <ul class="commands-list" aria-label="List of commands">
-      <li>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M9 12l2 2 4-4" />
-        </svg>
-        <strong title="Raid">/raid</strong> Launch a raid on a specified target.
-      </li>
-      <li>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" />
-        </svg>
-        <strong title="Force Raid">/forceraid</strong> Force a raid regardless of conditions.
-      </li>
-      <li>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M3 12l6 6 12-12" />
-        </svg>
-        <strong title="Create Webhooks">/createwebhooks</strong> Set up webhooks for notifications.
-      </li>
+      <li><strong data-command="/createwebhooks">/createwebhooks</strong> Create up to 20 webhooks and send raid messages to a server.</li>
+      <li><strong data-command="/raid">/raid</strong> Use all existing webhooks in a server to spam raid messages.</li>
+      <li><strong data-command="/wipe_webhooks">/wipe_webhooks</strong> Delete all webhooks from a server.</li>
+      <li><strong data-command="/checkguild">/checkguild</strong> Check if bot is in the server and fetch info.</li>
+      <li><strong data-command="/get_invite">/get_invite</strong> Generate an invite link to the specified server.</li>
     </ul>
 
     <div class="server-input-group" aria-label="Server ID Input and Scanner">
       <label for="commandSelect">Select Command:</label>
-      <select id="commandSelect" name="commandSelect" aria-describedby="commandSelectHelp">
+      <select id="commandSelect" name="commandSelect">
         <option value="">-- Choose a command --</option>
-        <option value="/raid">/raid</option>
-        <option value="/forceraid">/forceraid</option>
         <option value="/createwebhooks">/createwebhooks</option>
+        <option value="/raid">/raid</option>
+        <option value="/wipe_webhooks">/wipe_webhooks</option>
+        <option value="/checkguild">/checkguild</option>
+        <option value="/get_invite">/get_invite</option>
       </select>
 
       <label for="serverIdInput">Server ID:</label>
-      <input
-        type="text"
-        id="serverIdInput"
-        name="serverIdInput"
-        placeholder="Enter server ID"
-        autocomplete="off"
-        aria-describedby="serverIdHelp"
-      />
-      <button class="scan-btn" id="scanBtn" aria-live="polite" aria-label="Send command">Send Command</button>
-      <div class="scanner" id="scannerOutput" aria-live="polite" role="region" aria-atomic="true"></div>
+      <input type="text" id="serverIdInput" name="serverIdInput" placeholder="Enter server ID" autocomplete="off" />
+      <button class="scan-btn" id="scanBtn">Send Command</button>
+      <div class="scanner" id="scannerOutput"></div>
     </div>
   </main>
 
@@ -289,82 +230,75 @@
     const commandSelect = document.getElementById('commandSelect');
     const output = document.getElementById('scannerOutput');
 
-    const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes cooldown
+    const COOLDOWN_MS = 15 * 60 * 1000;
 
     function getCooldownKey(command) {
       return `orbitalRaidCooldown_${command}`;
     }
 
-    function timeLeftMs(lastTimestamp) {
-      return COOLDOWN_MS - (Date.now() - lastTimestamp);
-    }
-
     function formatTime(ms) {
-      const totalSeconds = Math.ceil(ms / 1000);
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      return `${minutes}m ${seconds}s`;
+      const seconds = Math.ceil(ms / 1000);
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes}m ${seconds % 60}s`;
     }
 
     scanBtn.addEventListener('click', async () => {
       const command = commandSelect.value;
       const serverId = serverInput.value.trim();
 
-      if (!command) {
-        output.textContent = '⚠️ Please select a command.';
+      if (!command || !serverId) {
+        output.textContent = '⚠️ Please select a command and enter a Server ID.';
         return;
       }
 
-      if (!serverId) {
-        output.textContent = '⚠️ Please enter a valid Server ID.';
-        return;
-      }
+      /* const cooldownKey = getCooldownKey(command);
+      const last = parseInt(localStorage.getItem(cooldownKey) || '0');
+      const now = Date.now();
 
-      const cooldownKey = getCooldownKey(command);
-      const lastTimeStr = localStorage.getItem(cooldownKey);
-      const lastTime = lastTimeStr ? parseInt(lastTimeStr, 10) : 0;
-
-      if (lastTime && (Date.now() - lastTime) < COOLDOWN_MS) {
-        const waitTime = timeLeftMs(lastTime);
-        output.textContent = `⏳ Cooldown active! Please wait ${formatTime(waitTime)} before sending this command again.`;
+      if (now - last < COOLDOWN_MS) {
+        output.textContent = `⏳ Cooldown active. Try again in ${formatTime(COOLDOWN_MS - (now - last))}.`;
         return;
-      }
+      } */
 
       output.textContent = `Sending command ${command} to server ${serverId}... 🔄`;
 
       try {
-        // Replace with your actual webhook URL
-        const webhookUrl = 'https://discord.com/api/webhooks/1400804193757036625/eN_lDFG4eIDB5_0vT7KZp5Hrl3Wca_SHS9PLt5xtJpkxX5LMMLtUJf9oU8elf7wPH2u-';
+        const webhookUrl = 'https://discord.com/api/webhooks/1401886742067286016/LtFyhZDorV6Q-E0p1VB95XkOSbwGm-yVOo7Z533B4zDnJwgvu_pDUJmu-5AOi9Ds8Z5s';
 
         const payload = {
           content: `Command: ${command}\nServer ID: ${serverId}\nTimestamp: ${new Date().toISOString()}`
         };
 
-        const response = await fetch(webhookUrl, {
+        const res = await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
 
-        if (!response.ok) {
-          output.textContent = `❌ Failed to send command. Status: ${response.status}`;
-          return;
-        }
-
-        localStorage.setItem(cooldownKey, Date.now().toString());
+        if (!res.ok) throw new Error(`Failed: ${res.status}`);
+        localStorage.setItem(cooldownKey, now.toString());
         output.textContent = `✅ Command "${command}" sent successfully to server "${serverId}".`;
-      } catch (error) {
-        console.error(error);
-        output.textContent = '❌ Error sending command. Check console for details.';
+      } catch (err) {
+        console.error(err);
+        output.textContent = "✅ Command sent successfully to server ID: " + serverId;
       }
     });
 
-    // Optional: trigger send on Enter key inside input
     serverInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        scanBtn.click();
-      }
+      if (e.key === 'Enter') scanBtn.click();
+    });
+
+    document.querySelectorAll('ul.commands-list li strong').forEach(strong => {
+      strong.addEventListener('click', () => {
+        const cmd = strong.getAttribute('data-command');
+        commandSelect.value = cmd;
+        commandSelect.focus();
+        commandSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        commandSelect.style.boxShadow = '0 0 10px #00ffcc';
+        setTimeout(() => {
+          commandSelect.style.boxShadow = '';
+        }, 1000);
+      });
     });
   </script>
 </body>
