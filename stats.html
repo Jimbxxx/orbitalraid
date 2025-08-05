@@ -9,15 +9,18 @@
     <style>
         body {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            margin: 0;
             min-height: 100vh;
-            position: relative;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
             color: #00ffcc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
         }
 
         .neon-text {
-            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
         }
 
         header {
@@ -100,7 +103,7 @@
 </head>
 
 <body>
-    <header>
+    <header class="bg-gray-900/80 p-6 text-center shadow-[0_0_15px_#00ffcc] fixed w-full top-0 z-10">
         <h1 class="text-5xl font-extrabold neon-text">ORBITAL RAID</h1>
         <nav id="navbar">
             <a href="index.html">Home</a>
