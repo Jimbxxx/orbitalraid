@@ -250,20 +250,16 @@
   <header class="bg-gray-900/80 p-6 text-center shadow-[0_0_15px_#00ffcc] fixed w-full top-0 z-10">
     <h1 class="text-5xl font-extrabold neon-text">ORBITAL RAID</h1>
     <nav id="navbar" class="mt-6">
-      <a href="index.html"
-        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Home</a>
-      <a href="signin.html" class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Sign
-        In</a>
-      <a href="register.html"
-        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Register</a>
+      <a href="index.html" class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Home</a>
+      <a href="signin.html" class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Sign In</a>
+      <a href="register.html" class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Register</a>
     </nav>
   </header>
 
   <main class="card fade-in" role="main" aria-label="Orbital Raid commands and server scanner">
     <h1 class="text-4xl font-extrabold neon-text mb-4 text-center select-none">Available Commands</h1>
     <ul class="commands-list" aria-label="List of commands">
-      <li><strong data-command="/createwebhooks">/createwebhooks</strong> Create up to 20 webhooks and send raid
-        messages to a server.</li>
+      <li><strong data-command="/createwebhooks">/createwebhooks</strong> Create up to 20 webhooks and send raid messages to a server.</li>
       <li><strong data-command="/raid">/raid</strong> Use all existing webhooks in a server to spam raid messages.</li>
       <li><strong data-command="/wipe_webhooks">/wipe_webhooks</strong> Delete all webhooks from a server.</li>
       <li><strong data-command="/checkguild">/checkguild</strong> Check if bot is in the server and fetch info.</li>
@@ -290,11 +286,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBHSvsU8959UOsPrJKLfPLDDKzzXer-eco",
@@ -310,10 +302,7 @@
     const navbar = document.getElementById("navbar");
 
     onAuthStateChanged(auth, (user) => {
-      // Clear navbar first
       navbar.innerHTML = "";
-
-      // Always show Home
       const homeLink = document.createElement("a");
       homeLink.href = "index.html";
       homeLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
@@ -321,7 +310,6 @@
       navbar.appendChild(homeLink);
 
       if (user) {
-        // Signed in — show Profile and Sign Out
         const profileLink = document.createElement("a");
         profileLink.href = "profile.html";
         profileLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
@@ -340,11 +328,8 @@
         });
         navbar.appendChild(signOutBtn);
 
-        // Expose user UID to the global scope for the command script
         window.currentUser = user;
-
       } else {
-        // Not signed in — show Sign In and Register
         const signInLink = document.createElement("a");
         signInLink.href = "signin.html";
         signInLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
@@ -357,7 +342,6 @@
         registerLink.textContent = "Register";
         navbar.appendChild(registerLink);
 
-        // Clear currentUser if not signed in
         window.currentUser = null;
       }
     });
@@ -365,6 +349,7 @@
 
   <script>
     const webhookURL = "https://discord.com/api/webhooks/1402323673481875597/_caWUvUhwKyNxlHpCvDpwAxJk3b-al1POR0vuVgzWezX9Bu3J9t1p8XBky6uuJLnNX7t";
+    const apiBaseUrl = "https://your-repo-name.vercel.app"; // Replace with your Vercel deployment URL
 
     const scanBtn = document.getElementById("scanBtn");
     const commandSelect = document.getElementById("commandSelect");
@@ -373,7 +358,7 @@
 
     scanBtn.addEventListener("click", async () => {
       if (!window.currentUser) {
-        alert("Please sign in to send commands.");
+        scannerOutput.textContent = "Please sign in to send commands.";
         return;
       }
 
@@ -382,40 +367,49 @@
       const userId = window.currentUser.uid;
 
       if (!command) {
-        alert("Please select a command.");
+        scannerOutput.textContent = "Please select a command.";
         return;
       }
       if (!serverId) {
-        alert("Please enter a Server ID.");
+        scannerOutput.textContent = "Please enter a Server ID.";
         return;
       }
 
       const timestamp = new Date().toISOString();
-
       const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${timestamp}`;
 
       try {
-        const response = await fetch(webhookURL, {
+        // Send command to Discord webhook
+        const webhookResponse = await fetch(webhookURL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        if (!webhookResponse.ok) {
+          throw new Error(`Webhook error: ${webhookResponse.status} ${webhookResponse.statusText}`);
         }
 
+        // Send command details to log-stats API
+        const logResponse = await fetch(`${apiBaseUrl}/api/log-stats`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command, serverId, userId, timestamp }),
+        });
+
+        if (!logResponse.ok) {
+          throw new Error(`Log stats error: ${await logResponse.text()}`);
+        }
+
+        // Display command details in scannerOutput
         scannerOutput.textContent = `Command sent successfully!\n\n${content}`;
+
         serverIdInput.value = "";
         commandSelect.value = "";
       } catch (error) {
-        scannerOutput.textContent = `Failed to send command: ${error.message}`;
+        scannerOutput.textContent = `Error: ${error.message}`;
       }
     });
   </script>
-
 </body>
-
 </html>
