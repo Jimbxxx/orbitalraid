@@ -87,13 +87,12 @@
     <nav id="navbar" class="mt-6">
       <a href="index.html"
         class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Home</a>
-      <a id="nav-signin" href="signin.html"
-        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Sign In</a>
-      <a id="nav-register" href="register.html"
-        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Register</a>
+      <a href="stats.html"
+        class="text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110">Stats</a>
       <button id="nav-signout"
-        class="text-2xl text-teal-300 mx-6 hover:text-teal-100 transition-all hover:scale-110 hidden">Sign Out</button>
+        class="text-2xl text-teal-300 mx-6 hover:text-teal-100 transition-all hover:scale-110">Sign Out</button>
     </nav>
+
 
   </header>
   <div class="w-full max-w-3xl p-8 space-y-8 pt-[7rem]">
@@ -231,10 +230,6 @@
 
       // Show profile info after auth
       onAuthStateChanged(auth, (user) => {
-        const navSignin = document.getElementById('nav-signin');
-        const navRegister = document.getElementById('nav-register');
-        const navSignout = document.getElementById('nav-signout');
-
         if (!user) {
           window.location.href = "signin.html";
           return;
@@ -249,12 +244,7 @@
 
         userEmailEl.textContent = user.email || "(no email)";
         userUsernameEl.textContent = user.displayName || "(no username)";
-        profilePicImg.src = user.photoURL || "https://via.placeholder.com/100?text=No+Photo";
-
-        // Toggle navbar links
-        navSignin.classList.add('hidden');
-        navRegister.classList.add('hidden');
-        navSignout.classList.remove('hidden');
+        profilePicImg.src = user.photoURL || "https://i.pravatar.cc/320";
       });
 
 
@@ -323,6 +313,8 @@
           alert("Error deleting account: " + error.message);
         }
       });
+
+      // Sign out button
       document.getElementById('nav-signout').addEventListener('click', async () => {
         try {
           await signOut(auth);
@@ -332,6 +324,7 @@
         }
       });
     </script>
+
 </body>
 
 </html>

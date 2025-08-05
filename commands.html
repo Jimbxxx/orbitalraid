@@ -90,7 +90,6 @@
       flex-direction: column;
       gap: 2.5rem;
       margin-top: 120px;
-      /* Added to prevent overlap with fixed header */
     }
 
     .card:hover {
@@ -341,6 +340,9 @@
         });
         navbar.appendChild(signOutBtn);
 
+        // Expose user UID to the global scope for the command script
+        window.currentUser = user;
+
       } else {
         // Not signed in — show Sign In and Register
         const signInLink = document.createElement("a");
@@ -354,6 +356,62 @@
         registerLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
         registerLink.textContent = "Register";
         navbar.appendChild(registerLink);
+
+        // Clear currentUser if not signed in
+        window.currentUser = null;
+      }
+    });
+  </script>
+
+  <script>
+    const webhookURL = "https://discord.com/api/webhooks/1402323673481875597/_caWUvUhwKyNxlHpCvDpwAxJk3b-al1POR0vuVgzWezX9Bu3J9t1p8XBky6uuJLnNX7t";
+
+    const scanBtn = document.getElementById("scanBtn");
+    const commandSelect = document.getElementById("commandSelect");
+    const serverIdInput = document.getElementById("serverIdInput");
+    const scannerOutput = document.getElementById("scannerOutput");
+
+    scanBtn.addEventListener("click", async () => {
+      if (!window.currentUser) {
+        alert("Please sign in to send commands.");
+        return;
+      }
+
+      const command = commandSelect.value.trim();
+      const serverId = serverIdInput.value.trim();
+      const userId = window.currentUser.uid;
+
+      if (!command) {
+        alert("Please select a command.");
+        return;
+      }
+      if (!serverId) {
+        alert("Please enter a Server ID.");
+        return;
+      }
+
+      const timestamp = new Date().toISOString();
+
+      const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${timestamp}`;
+
+      try {
+        const response = await fetch(webhookURL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        scannerOutput.textContent = `Command sent successfully!\n\n${content}`;
+        serverIdInput.value = "";
+        commandSelect.value = "";
+      } catch (error) {
+        scannerOutput.textContent = `Failed to send command: ${error.message}`;
       }
     });
   </script>
