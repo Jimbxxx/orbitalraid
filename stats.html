@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orbital Raid - Stats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+            color: #00ffcc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+        }
+
+        header {
+            background: rgba(31, 41, 55, 0.8);
+            padding: 1.5rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 0 15px #00ffcc;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Wrap nav links in flex with gap */
+        #navbar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            /* spacing between links */
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Common styles for links & buttons in navbar */
+        #navbar a,
+        #navbar button {
+            font-size: 1.5rem;
+            color: #14b8a6;
+            margin: 0;
+            /* gap handles spacing now */
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #navbar a:hover,
+        #navbar button:hover {
+            color: #a7f3d0;
+            transform: scale(1.1);
+        }
+
+        main {
+            padding: 160px 20px 40px;
+            /* increased top padding for header + gap */
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stats-card {
+            background: rgba(31, 41, 55, 0.7);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+
+        h1,
+        h2 {
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid #00ffcc;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 0 15px #00ffcc;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #00ffcc;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 class="text-5xl font-extrabold neon-text">ORBITAL RAID</h1>
+        <nav id="navbar">
+            <a href="index.html">Home</a>
+            <a id="signin-link" href="signin.html">Sign In</a>
+            <a id="register-link" href="register.html">Register</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="text-4xl font-bold neon-text mb-12 text-center">Your Raid Stats</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div class="stat-card">
+                <h3 class="text-3xl font-semibold mb-2">Total Raids</h3>
+                <p id="total-raids" class="text-2xl">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="text-3xl font-semibold mb-2">Webhooks Created</h3>
+                <p id="webhooks-created" class="text-2xl">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="text-3xl font-semibold mb-2">Credits Used</h3>
+                <p id="credits-used" class="text-2xl">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="text-3xl font-semibold mb-2">Current Credits</h3>
+                <p id="current-credits" class="text-2xl">Loading...</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHSvsU8959UOsPrJKLfPLDDKzzXer-eco",
+            authDomain: "orbital-raid-data.firebaseapp.com",
+            projectId: "orbital-raid-data",
+            storageBucket: "orbital-raid-data.firebasestorage.app",
+            messagingSenderId: "1026103707268",
+            appId: "1:1026103707268:web:82aadea2cd5765599824d1",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const navbar = document.getElementById("navbar");
+        const signinLink = document.getElementById("signin-link");
+        const registerLink = document.getElementById("register-link");
+
+        // Stat element refs
+        const totalRaidsEl = document.getElementById("total-raids");
+        const webhooksCreatedEl = document.getElementById("webhooks-created");
+        const creditsUsedEl = document.getElementById("credits-used");
+        const currentCreditsEl = document.getElementById("current-credits");
+
+        function createNavLink(href, id, text) {
+            const a = document.createElement("a");
+            a.href = href;
+            a.id = id;
+            a.textContent = text;
+            a.style.cssText = "font-size:1.5rem; color:#14b8a6; transition: all 0.3s ease; text-decoration:none;";
+            a.onmouseover = () => a.style.color = "#a7f3d0";
+            a.onmouseout = () => a.style.color = "#14b8a6";
+            return a;
+        }
+
+        function createSignOutButton() {
+            const btn = document.createElement("button");
+            btn.id = "signout-button";
+            btn.textContent = "Sign Out";
+            btn.style.cssText = "font-size:1.5rem; color:#14b8a6; background:none; border:none; cursor:pointer; transition: all 0.3s ease;";
+            btn.onmouseover = () => btn.style.color = "#a7f3d0";
+            btn.onmouseout = () => btn.style.color = "#14b8a6";
+            btn.onclick = () => {
+                signOut(auth).then(() => {
+                    location.href = "index.html";
+                }).catch(console.error);
+            };
+            return btn;
+        }
+
+        function clearStats() {
+            totalRaidsEl.textContent = "0";
+            webhooksCreatedEl.textContent = "0";
+            creditsUsedEl.textContent = "0";
+            currentCreditsEl.textContent = "0";
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                signinLink.style.display = "none";
+                registerLink.style.display = "none";
+
+                if (!document.getElementById("profile-link")) {
+                    navbar.appendChild(createNavLink("profile.html", "profile-link", "Profile"));
+                }
+                if (!document.getElementById("stats-link")) {
+                    navbar.appendChild(createNavLink("stats.html", "stats-link", "Stats"));
+                }
+                if (!document.getElementById("signout-button")) {
+                    navbar.appendChild(createSignOutButton());
+                }
+
+                // Fetch user stats from Firestore
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    if (userDocSnap.exists()) {
+                        const data = userDocSnap.data();
+
+                        totalRaidsEl.textContent = data.totalRaids ?? "0";
+                        webhooksCreatedEl.textContent = data.webhooksCreated ?? "0";
+                        creditsUsedEl.textContent = data.creditsUsed ?? "0";
+                        currentCreditsEl.textContent = data.currentCredits ?? "0";
+                    } else {
+                        clearStats();
+                    }
+                } catch (error) {
+                    console.error("Error fetching stats:", error);
+                    totalRaidsEl.textContent = "Error";
+                    webhooksCreatedEl.textContent = "Error";
+                    creditsUsedEl.textContent = "Error";
+                    currentCreditsEl.textContent = "Error";
+                }
+            } else {
+                signinLink.style.display = "inline";
+                registerLink.style.display = "inline";
+
+                const profileLink = document.getElementById("profile-link");
+                if (profileLink) navbar.removeChild(profileLink);
+
+                const statsLink = document.getElementById("stats-link");
+                if (statsLink) navbar.removeChild(statsLink);
+
+                const signoutBtn = document.getElementById("signout-button");
+                if (signoutBtn) navbar.removeChild(signoutBtn);
+
+                clearStats();
+            }
+        });
+    </script>
+</body>
+
+</html>

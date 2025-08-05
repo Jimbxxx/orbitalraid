@@ -289,100 +289,12 @@
     </div>
   </main>
 
-  <script>
-    document.addEventListener("click", function (e) {
-      const ripple = document.createElement("span");
-      ripple.classList.add("ripple");
-      ripple.style.left = `${e.clientX - 10}px`;
-      ripple.style.top = `${e.clientY - 10}px`;
-      ripple.style.width = "20px";
-      ripple.style.height = "20px";
-      document.body.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
-    });
-
-    const scanBtn = document.getElementById('scanBtn');
-    const serverInput = document.getElementById('serverIdInput');
-    const commandSelect = document.getElementById('commandSelect');
-    const output = document.getElementById('scannerOutput');
-
-    const COOLDOWN_MS = 15 * 60 * 1000;
-
-    function getCooldownKey(command) {
-      return `orbitalRaidCooldown_${command}`;
-    }
-
-    function formatTime(ms) {
-      const seconds = Math.ceil(ms / 1000);
-      const minutes = Math.floor(seconds / 60);
-      return `${minutes}m ${seconds % 60}s`;
-    }
-
-    scanBtn.addEventListener('click', async () => {
-      const command = commandSelect.value;
-      const serverId = serverInput.value.trim();
-
-      if (!command || !serverId) {
-        output.textContent = '⚠️ Please select a command and enter a Server ID.';
-        return;
-      }
-
-      /* const cooldownKey = getCooldownKey(command);
-      const last = parseInt(localStorage.getItem(cooldownKey) || '0');
-      const now = Date.now();
-
-      if (now - last < COOLDOWN_MS) {
-        output.textContent = `⏳ Cooldown active. Try again in ${formatTime(COOLDOWN_MS - (now - last))}.`;
-        return;
-      } */
-
-      output.textContent = `Sending command ${command} to server ${serverId}... 🔄`;
-
-      try {
-        const webhookUrl = 'https://discord.com/api/webhooks/1401886742067286016/LtFyhZDorV6Q-E0p1VB95XkOSbwGm-yVOo7Z533B4zDnJwgvu_pDUJmu-5AOi9Ds8Z5s';
-
-        const payload = {
-          content: `Command: ${command}\nServer ID: ${serverId}\nTimestamp: ${new Date().toISOString()}`
-        };
-
-        const res = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) throw new Error(`Failed: ${res.status}`);
-        localStorage.setItem(cooldownKey, now.toString());
-        output.textContent = `✅ Command "${command}" sent successfully to server "${serverId}".`;
-      } catch (err) {
-        console.error(err);
-        output.textContent = "✅ Command sent successfully to server ID: " + serverId;
-      }
-    });
-
-    serverInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') scanBtn.click();
-    });
-
-    document.querySelectorAll('ul.commands-list li strong').forEach(strong => {
-      strong.addEventListener('click', () => {
-        const cmd = strong.getAttribute('data-command');
-        commandSelect.value = cmd;
-        commandSelect.focus();
-        commandSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        commandSelect.style.boxShadow = '0 0 10px #00ffcc';
-        setTimeout(() => {
-          commandSelect.style.boxShadow = '';
-        }, 1000);
-      });
-    });
-
-    import {
-      initializeApp,
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import {
       getAuth,
       onAuthStateChanged,
+      signOut
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -396,30 +308,56 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
     const navbar = document.getElementById("navbar");
 
     onAuthStateChanged(auth, (user) => {
+      // Clear navbar first
+      navbar.innerHTML = "";
+
+      // Always show Home
+      const homeLink = document.createElement("a");
+      homeLink.href = "index.html";
+      homeLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
+      homeLink.textContent = "Home";
+      navbar.appendChild(homeLink);
+
       if (user) {
-        // User signed in — add Profile link if not already there
-        if (!document.getElementById("profile-link")) {
-          const profileLink = document.createElement("a");
-          profileLink.href = "profile.html";
-          profileLink.id = "profile-link";
-          profileLink.className =
-            "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
-          profileLink.textContent = "Profile";
-          navbar.appendChild(profileLink);
-        }
+        // Signed in — show Profile and Sign Out
+        const profileLink = document.createElement("a");
+        profileLink.href = "profile.html";
+        profileLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
+        profileLink.textContent = "Profile";
+        navbar.appendChild(profileLink);
+
+        const signOutBtn = document.createElement("a");
+        signOutBtn.href = "#";
+        signOutBtn.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
+        signOutBtn.textContent = "Sign Out";
+        signOutBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          signOut(auth).then(() => {
+            window.location.reload();
+          });
+        });
+        navbar.appendChild(signOutBtn);
+
       } else {
-        // User signed out — remove Profile link if it exists
-        const profileLink = document.getElementById("profile-link");
-        if (profileLink) {
-          navbar.removeChild(profileLink);
-        }
+        // Not signed in — show Sign In and Register
+        const signInLink = document.createElement("a");
+        signInLink.href = "signin.html";
+        signInLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
+        signInLink.textContent = "Sign In";
+        navbar.appendChild(signInLink);
+
+        const registerLink = document.createElement("a");
+        registerLink.href = "register.html";
+        registerLink.className = "text-2xl text-teal-300 hover:text-teal-100 mx-6 transition-all hover:scale-110";
+        registerLink.textContent = "Register";
+        navbar.appendChild(registerLink);
       }
     });
   </script>
+
 </body>
 
 </html>
