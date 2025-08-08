@@ -439,8 +439,6 @@
         scannerOutput.textContent = "Please enter a Server ID.";
         return;
       }
-
-<<<<<<< HEAD
       const timestamp = new Date().toISOString();
       const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${timestamp}`;
 =======
@@ -449,7 +447,6 @@
       const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${new Date().toISOString()}`;
 
       scannerOutput.textContent = "Sending command...";
->>>>>>> fb49d2b (added commands)
 
       try {
         // Send command to Discord webhook
@@ -463,7 +460,6 @@
           throw new Error(`Webhook error: ${webhookResponse.status} ${webhookResponse.statusText}`);
         }
 
-<<<<<<< HEAD
         // Send command details to log-stats API
         const logResponse = await fetch(`${apiBaseUrl}/api/log-stats`, {
           method: "POST",
@@ -506,6 +502,5 @@
     </a>
   </div>
 
->>>>>>> fb49d2b (added commands)
 </body>
 </html>
