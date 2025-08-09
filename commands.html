@@ -411,92 +411,86 @@
     });
   </script>
 
-  <script>
-    const webhookURL = "https://discord.com/api/webhooks/1402323673481875597/_caWUvUhwKyNxlHpCvDpwAxJk3b-al1POR0vuVgzWezX9Bu3J9t1p8XBky6uuJLnNX7t";
-    const apiBaseUrl = "https://your-repo-name.vercel.app"; // Replace with your Vercel deployment URL
+<!-- Command Logic Script -->
+<script>
+  const webhookURL = "https://discord.com/api/webhooks/1402323673481875597/_caWUvUhwKyNxlHpCvDpwAxJk3b-al1POR0vuVgzWezX9Bu3J9t1p8XBky6uuJLnNX7t";
+  const apiBaseUrl = "https://your-repo-name.vercel.app"; // Replace with your Vercel deployment URL
 
-    const scanBtn = document.getElementById("scanBtn");
-    const commandSelect = document.getElementById("commandSelect");
-    const serverIdInput = document.getElementById("serverIdInput");
-    const scannerOutput = document.getElementById("scannerOutput");
+  const scanBtn = document.getElementById("scanBtn");
+  const commandSelect = document.getElementById("commandSelect");
+  const serverIdInput = document.getElementById("serverIdInput");
+  const scannerOutput = document.getElementById("scannerOutput");
 
-    scanBtn.addEventListener("click", async () => {
-      if (!window.currentUser) {
-        scannerOutput.textContent = "Please sign in to send commands.";
-        return;
+  scanBtn.addEventListener("click", async () => {
+    if (!window.currentUser) {
+      scannerOutput.textContent = "Please sign in to send commands.";
+      return;
+    }
+
+    const command = commandSelect.value.trim();
+    const serverId = serverIdInput.value.trim();
+    const userId = window.currentUser.uid;
+
+    if (!command) {
+      scannerOutput.textContent = "Please select a command.";
+      return;
+    }
+
+    if (!serverId) {
+      scannerOutput.textContent = "Please enter a Server ID.";
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${timestamp}`;
+
+    scannerOutput.textContent = "Sending command...";
+
+    try {
+      // Send command to Discord webhook
+      const webhookResponse = await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!webhookResponse.ok) {
+        throw new Error(`Webhook error: ${webhookResponse.status} ${webhookResponse.statusText}`);
       }
 
-      const command = commandSelect.value.trim();
-      const serverId = serverIdInput.value.trim();
-      const userId = window.currentUser.uid;
+      // Send command details to log-stats API
+      const logResponse = await fetch(`${apiBaseUrl}/api/log-stats`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command, serverId, userId, timestamp }),
+      });
 
-      if (!command) {
-        scannerOutput.textContent = "Please select a command.";
-        return;
+      if (!logResponse.ok) {
+        throw new Error(`Log stats error: ${await logResponse.text()}`);
       }
 
-      if (!serverId) {
-        scannerOutput.textContent = "Please enter a Server ID.";
-        return;
-      }
-      const timestamp = new Date().toISOString();
-      const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${timestamp}`;
-      const webhookURL = "https://discord.com/api/webhooks/1402323673481875597/_caWUvUhwKyNxlHpCvDpwAxJk3b-al1POR0vuVgzWezX9Bu3J9t1p8XBky6uuJLnNX7t";
+      // Display command details in scannerOutput
+      scannerOutput.textContent = `Command sent successfully!\n\n${content}`;
+      serverIdInput.value = "";
+      commandSelect.value = "";
+    } catch (error) {
+      console.error("Failed to send command:", error);
+      scannerOutput.textContent = `Error: ${error.message}`;
+    }
+  });
+</script>
 
-      const content = `Command: ${command}\nServer ID: ${serverId}\nUser ID: ${userId}\nTimestamp: ${new Date().toISOString()}`;
-
-      scannerOutput.textContent = "Sending command...";
-
-      try {
-        // Send command to Discord webhook
-        const webhookResponse = await fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content }),
-        });
-
-        if (!webhookResponse.ok) {
-          throw new Error(`Webhook error: ${webhookResponse.status} ${webhookResponse.statusText}`);
-        }
-
-        // Send command details to log-stats API
-        const logResponse = await fetch(`${apiBaseUrl}/api/log-stats`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ command, serverId, userId, timestamp }),
-        });
-
-        if (!logResponse.ok) {
-          throw new Error(`Log stats error: ${await logResponse.text()}`);
-        }
-
-        // Display command details in scannerOutput
-        scannerOutput.textContent = `Command sent successfully!\n\n${content}`;
-
-        serverIdInput.value = "";
-        commandSelect.value = "";
-      } catch (error) {
-        scannerOutput.textContent = `Error: ${error.message}`;
-      }
-    });
-    scannerOutput.textContent = `Command "${command}" sent successfully.`;
-    serverIdInput.value = "";
-    commandSelect.value = "";
-  } catch (error) {
-    console.error("Failed to send command:", error);
-    scannerOutput.textContent = "Failed to send command. Check console for details.";
-  }
-});
-  <div id="infoPanel" role="alert" aria-live="polite">
-    <p>
-      Commands will not work if the bot is not in the server, credits are still taken and will not be refunded if you
-      have not added the bot.
-    </p>
-    <a href="https://discord.com/oauth2/authorize?client_id=1400789763107196928&permissions=8&integration_type=0&scope=bot"
-      target="_blank" rel="noopener noreferrer" id="inviteBotLink">
-      Invite Bot
-    </a>
-  </div>
+<!-- Info Panel -->
+<div id="infoPanel" role="alert" aria-live="polite">
+  <p>
+    Commands will not work if the bot is not in the server, credits are still taken and will not be refunded if you
+    have not added the bot.
+  </p>
+  <a href="https://discord.com/oauth2/authorize?client_id=1400789763107196928&permissions=8&integration_type=0&scope=bot"
+    target="_blank" rel="noopener noreferrer" id="inviteBotLink">
+    Invite Bot
+  </a>
+</div>
 
 </body>
 </html>
