@@ -479,14 +479,14 @@
         scannerOutput.textContent = `Error: ${error.message}`;
       }
     });
-        scannerOutput.textContent = `Command "${command}" sent successfully.`;
-        serverIdInput.value = "";
-        commandSelect.value = "";
-      } catch (error) {
-        console.error("Failed to send command:", error);
-        scannerOutput.textContent = "Failed to send command. Check console for details.";
-      }
-    });
+    scannerOutput.textContent = `Command "${command}" sent successfully.`;
+    serverIdInput.value = "";
+    commandSelect.value = "";
+  } catch (error) {
+    console.error("Failed to send command:", error);
+    scannerOutput.textContent = "Failed to send command. Check console for details.";
+  }
+});
   <div id="infoPanel" role="alert" aria-live="polite">
     <p>
       Commands will not work if the bot is not in the server, credits are still taken and will not be refunded if you
